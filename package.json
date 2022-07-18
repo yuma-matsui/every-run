@@ -9,6 +9,9 @@
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
     "eslint": "^8.20.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-config-standard-typescript": "^1.0.3",
+    "eslint-plugin-import": "^2.26.0",
     "typescript": "^4.7.4"
   }
 }
