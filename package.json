@@ -1,13 +1,24 @@
 {
   "name": "every-run",
   "version": "1.0.0",
+  "description": "A package to record log for runners",
   "type": "module",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
     "test": "jest"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuma-matsui/every-run"
+  },
+  "keywords": [
+    "run",
+    "running"
+  ],
+  "author": "yum",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
