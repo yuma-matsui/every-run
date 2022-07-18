@@ -1,8 +1,11 @@
 {
   "name": "every-run",
   "version": "1.0.0",
+  "type": "module",
+  "main": "main.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/node": "^18.0.6",
