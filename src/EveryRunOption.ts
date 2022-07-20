@@ -44,8 +44,8 @@ export class EveryRunOption {
     if (typeof param === 'boolean') return param
 
     const numberParam = Number(param)
-    if (Number.isNaN(numberParam)) {
-      console.log('オプション引数が不正です。数値を指定してください。')
+    if (Number.isNaN(numberParam) || (numberParam <= 0)) {
+      console.log('オプション引数が不正です。0より大きい数値を指定してください。')
       process.exit()
     }
     return numberParam
