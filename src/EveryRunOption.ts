@@ -12,6 +12,20 @@ export class EveryRunOption {
       .option('-e, --e <integer>')
       .parse(process.argv)
     this.#parameters = program.opts()
+    this.#inspectParameters()
+  }
+
+  #inspectParameters (): void {
+    const parameters: Array<number | boolean> = []
+    for (const value of Object.values(this.parameters)) {
+      if ((typeof value === 'number') || (typeof value === 'boolean')) parameters.push(value)
+    }
+
+    const entries = parameters.filter(param => param)
+    if (entries.length > 1) {
+      console.log('オプション指定は1つまでです。')
+      process.exit()
+    }
   }
 
   get parameters (): EveryRunOptions {
