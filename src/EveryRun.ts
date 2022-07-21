@@ -17,10 +17,8 @@ export class EveryRun {
   async #start () {
     if (this.#options.t) {
       this.#readTotalLog()
-    } else if (this.#options.y) {
-      this.#readYearlyLog()
-    } else if (this.#options.m) {
-      this.#readMonthlyLog()
+    } else if (this.#options.y || this.#options.m) {
+      this.#readPeriodLog()
     } else if (this.#options.e) {
       this.#insertExtraLog()
     } else if (this.#options.u) {
@@ -34,12 +32,9 @@ export class EveryRun {
     console.log('Show your total running log.')
   }
 
-  #readYearlyLog () {
-    console.log(`Show your ${Number(this.#options.y)}'s total running log`)
-  }
-
-  #readMonthlyLog () {
-    console.log(`Show your ${Number(this.#options.m)}'s total running log`)
+  #readPeriodLog () {
+    console.log('Show your yearly total running log')
+    console.log('Show your monthly total running log')
   }
 
   #insertExtraLog () {
