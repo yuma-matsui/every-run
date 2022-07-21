@@ -1,12 +1,14 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
 import { Runner } from './Runner.js'
+import { EveryRunOptions } from './interfaces/CliOptions.js'
+import { EveryRunOption } from './EveryRunOption.js'
 
 export class EveryRun {
   static async start () {
     try {
       const distance = await this.askDistance()
-      const er = new EveryRun(distance)
+      const er = new EveryRun(distance, new EveryRunOption().parameters)
       er.#start()
     } catch (error) {
       if (error instanceof Error) {
@@ -32,8 +34,10 @@ export class EveryRun {
   }
 
   #runner: Runner
-  constructor (distance: number) {
+  #options: EveryRunOptions
+  constructor (distance: number, options: EveryRunOptions) {
     this.#runner = new Runner(distance)
+    this.#options = options
   }
 
   #start () {
