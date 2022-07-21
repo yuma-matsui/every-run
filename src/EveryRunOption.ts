@@ -12,6 +12,20 @@ export class EveryRunOption {
       .option('-e, --e <integer>')
       .parse(process.argv)
     this.#parameters = program.opts()
+    this.#inspectParameters()
+  }
+
+  #inspectParameters (): void {
+    const parameters: Array<number | boolean> = []
+    for (const value of Object.values(this.parameters)) {
+      if ((typeof value === 'number') || (typeof value === 'boolean')) parameters.push(value)
+    }
+
+    const entries = parameters.filter(param => param)
+    if (entries.length > 1) {
+      console.log('オプション指定は1つまでです。')
+      process.exit()
+    }
   }
 
   get parameters (): EveryRunOptions {
@@ -30,8 +44,8 @@ export class EveryRunOption {
     if (typeof param === 'boolean') return param
 
     const numberParam = Number(param)
-    if (Number.isNaN(numberParam)) {
-      console.log('オプション引数が不正です。数値を指定してください。')
+    if (Number.isNaN(numberParam) || (numberParam <= 0)) {
+      console.log('オプション引数が不正です。0より大きい数値を指定してください。')
       process.exit()
     }
     return numberParam
