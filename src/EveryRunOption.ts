@@ -22,10 +22,14 @@ export class EveryRunOption {
     }
 
     const entries = parameters.filter(param => param)
-    if (entries.length > 1) {
-      console.log('オプション指定は1つまでです。')
+    if ((!this.#existYearAndMonth() && entries.length > 1) || (this.#existYearAndMonth() && entries.length > 2)) {
+      console.log('Invalid Options.')
       process.exit()
     }
+  }
+
+  #existYearAndMonth (): boolean {
+    return (typeof this.parameters.y === 'number') && (typeof this.parameters.m === 'number')
   }
 
   get parameters (): EveryRunOptions {
