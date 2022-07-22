@@ -1,22 +1,65 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
 import { Runner } from './Runner.js'
+import { EveryRunOptions } from './interfaces/CliOptions.js'
 
 export class EveryRun {
-  static async start () {
-    try {
-      const distance = await this.askDistance()
-      const er = new EveryRun(distance)
-      er.#start()
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.message)
-        process.exit(1)
-      }
+  static async start (options: EveryRunOptions) {
+    const er = new EveryRun(options)
+    await er.#start()
+  }
+
+  #options: EveryRunOptions
+  constructor (options: EveryRunOptions) {
+    this.#options = options
+  }
+
+  async #start () {
+    if (this.#options.t) {
+      this.#readTotalLog()
+    } else if (this.#options.y || this.#options.m) {
+      this.#readPeriodLog()
+    } else if (this.#options.e) {
+      this.#insertExtraLog()
+    } else if (this.#options.u) {
+      this.#updateDailyGoal()
+    } else {
+      await this.#firstOrCreate()
     }
   }
 
-  static askDistance () {
+  #readTotalLog () {
+    console.log('Show your total running log.')
+  }
+
+  #readPeriodLog () {
+    console.log('Show your yearly total running log')
+    console.log('Show your monthly total running log')
+  }
+
+  #insertExtraLog () {
+    console.log(`Fantastic!! You've reached ${Number(this.#options.e)} km.`)
+  }
+
+  #updateDailyGoal () {
+    console.log('How many kilometer do you run a day?')
+  }
+
+  async #firstOrCreate () {
+    if (this.#existRunner()) {
+      console.log("Congratulation! You've reached your daily goal.")
+    } else {
+      const distance = await this.#askDistance()
+      const runner = new Runner(distance)
+      console.log(`Good Luck! You set the ${runner.targetDistance} as your daily goal.`)
+    }
+  }
+
+  #existRunner (): boolean {
+    return true
+  }
+
+  #askDistance () {
     return new Promise<number>((resolve, reject) => {
       const rl = readline.createInterface({ input, output })
       rl.question('How many kilometer do you run a day?\n', answer => {
@@ -27,16 +70,7 @@ export class EveryRun {
     })
   }
 
-  static #isInvalidAnswer (answer: string): boolean {
+  #isInvalidAnswer (answer: string): boolean {
     return Number.isNaN(Number(answer)) || Number(answer) <= 0 || Number(answer) > 20
-  }
-
-  #runner: Runner
-  constructor (distance: number) {
-    this.#runner = new Runner(distance)
-  }
-
-  #start () {
-    console.log(`Good Luck! You set the ${this.#runner.targetDistance} as your goal.`)
   }
 }
