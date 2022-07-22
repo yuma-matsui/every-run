@@ -1,4 +1,4 @@
-interface CliOPtions {
+interface CliOptions {
   t?: boolean
   m?: string
   y?: string
@@ -16,4 +16,4 @@ interface EveryRunOptions {
   e: NumUnionBool
 }
 
-export { CliOPtions, EveryRunOptions }
+export { CliOptions, EveryRunOptions }
