@@ -97,11 +97,12 @@ describe('EveryRunOptionクラス', () => {
         it('引数の指定がなかった場合', () => {
           Mock.cliOptions({})
           const ero = new EveryRunOption()
-          expect(ero.parameters.t).toEqual(false)
-          expect(ero.parameters.y).toEqual(false)
-          expect(ero.parameters.m).toEqual(false)
-          expect(ero.parameters.u).toEqual(false)
-          expect(ero.parameters.e).toEqual(false)
+          const eroKeys: Array<keyof EveryRunOptions> = [
+            't', 'y', 'm', 'e', 'u'
+          ]
+          for (const key of eroKeys) {
+            expect(ero.parameters[key]).toEqual(false)
+          }
         })
       })
     })
