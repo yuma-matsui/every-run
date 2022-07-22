@@ -1,8 +1,8 @@
 import { program } from 'commander'
-import { CliOPtions, EveryRunOptions } from './interfaces/CliOptions.js'
+import { CliOptions, EveryRunOptions } from './interfaces/CliOptions.js'
 
 export class EveryRunOption {
-  readonly #parameters: CliOPtions
+  readonly #parameters: CliOptions
   constructor () {
     program
       .option('-t')
