@@ -2,16 +2,19 @@ import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
 import { Runner } from './Runner.js'
 import { EveryRunOptions } from './interfaces/CliOptions.js'
+import { EveryRunDB } from './EveryRunDB.js'
 
 export class EveryRun {
-  static async start (options: EveryRunOptions) {
-    const er = new EveryRun(options)
+  static async start (options: EveryRunOptions, db: EveryRunDB) {
+    const er = new EveryRun(options, db)
     await er.#start()
   }
 
   #options: EveryRunOptions
-  constructor (options: EveryRunOptions) {
+  #db: EveryRunDB
+  constructor (options: EveryRunOptions, db: EveryRunDB) {
     this.#options = options
+    this.#db = db
   }
 
   async #start () {
