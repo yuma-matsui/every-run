@@ -1,6 +1,4 @@
-import * as sqlite3 from 'sqlite3'
-import type { sqlite3 as Sqlite3 } from 'sqlite3'
-
+import sqlite3 from 'sqlite3'
 export class EveryRunDB {
   static storage = './every_run.db'
   static createRunnerTableStatement = 'CREATE TABLE if not exists Runner (id INTEGER PRIMARY KEY AUTOINCREMENT, distance INTEGER)'
@@ -8,8 +6,8 @@ export class EveryRunDB {
 
   #db: sqlite3.Database
   constructor () {
-    const sqlite: Sqlite3 = sqlite3.verbose()
-    this.#db = new sqlite.Database(EveryRunDB.storage)
+    sqlite3.verbose()
+    this.#db = new sqlite3.Database(EveryRunDB.storage)
     this.#createTable(EveryRunDB.createRunnerTableStatement)
     this.#createTable(EveryRunDB.createRunningLogTableStatement)
   }
