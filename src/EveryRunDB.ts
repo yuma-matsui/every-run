@@ -1,9 +1,10 @@
-import sqlite3 from 'sqlite3'
+import sqlite3, { type RunResult } from 'sqlite3'
 export class EveryRunDB {
   static storage = './every_run.db'
   static createRunnerTableStatement = 'CREATE TABLE if not exists Runner (id INTEGER PRIMARY KEY AUTOINCREMENT, distance INTEGER)'
   static createRunningLogTableStatement = 'CREATE TABLE if not exists RunningLog (id INTEGER PRIMARY KEY AUTOINCREMENT, distance INTEGER, date TEXT)'
   static insertRunnerStatement = 'INSERT INTO Runner (distance) VALUES (?)'
+  static selectAllFromRunnerStatement = 'SELECT * FROM Runner'
 
   #db: sqlite3.Database
   constructor () {
@@ -37,5 +38,17 @@ export class EveryRunDB {
       statement.finalize()
     }
     this.#serialize(method)
+  }
+
+  all () {
+    return new Promise<RunResult[]>(resolve => {
+      const method = () => {
+        this.#db.all(EveryRunDB.selectAllFromRunnerStatement, (error: Error, runners: RunResult[]) => {
+          if (error) throw error
+          resolve(runners)
+        })
+      }
+      this.#serialize(method)
+    })
   }
 }
