@@ -1,17 +1,14 @@
 import sqlite3, { type RunResult } from 'sqlite3'
+import * as SqlStatement from './every_run_db_statements.js'
 export class EveryRunDB {
   static storage = './every_run.db'
-  static createRunnerTableStatement = 'CREATE TABLE if not exists Runner (id INTEGER PRIMARY KEY AUTOINCREMENT, distance INTEGER)'
-  static createRunningLogTableStatement = 'CREATE TABLE if not exists RunningLog (id INTEGER PRIMARY KEY AUTOINCREMENT, distance INTEGER, date TEXT)'
-  static insertRunnerStatement = 'INSERT INTO Runner (distance) VALUES (?)'
-  static selectAllFromRunnerStatement = 'SELECT * FROM Runner'
 
   #db: sqlite3.Database
   constructor () {
     sqlite3.verbose()
     this.#db = new sqlite3.Database(EveryRunDB.storage)
-    this.#createTable(EveryRunDB.createRunnerTableStatement)
-    this.#createTable(EveryRunDB.createRunningLogTableStatement)
+    this.#createTable(SqlStatement.createRunnerTable)
+    this.#createTable(SqlStatement.createRunningLogTable)
   }
 
   close () {
@@ -33,22 +30,54 @@ export class EveryRunDB {
 
   insertRunner (distance: number) {
     const method = () => {
-      const statement = this.#db.prepare(EveryRunDB.insertRunnerStatement)
+      const statement = this.#db.prepare(SqlStatement.insertRunner)
       statement.run(distance)
       statement.finalize()
     }
     this.#serialize(method)
   }
 
-  all () {
-    return new Promise<RunResult[]>(resolve => {
+  getDailyGoal () {
+    return new Promise<number>(resolve => {
       const method = () => {
-        this.#db.all(EveryRunDB.selectAllFromRunnerStatement, (error: Error, runners: RunResult[]) => {
+        this.#db.get(SqlStatement.selectDistanceFromRunner, (error: Error, { distance }: { distance: number }) => {
           if (error) throw error
-          resolve(runners)
+          resolve(distance)
         })
       }
       this.#serialize(method)
     })
+  }
+
+  all (table: 'runner' | 'runningLog') {
+    return new Promise<RunResult[]>(resolve => {
+      const sqlStatement = this.#runnerOrRunningLog(table)
+      const method = () => {
+        this.#db.all(sqlStatement, (error: Error, rows: RunResult[]) => {
+          if (error) throw error
+          resolve(rows)
+        })
+      }
+      this.#serialize(method)
+    })
+  }
+
+  #runnerOrRunningLog (table: 'runner' | 'runningLog') {
+    let sqlStatement: string
+    if (table === 'runner') {
+      sqlStatement = SqlStatement.selectAllFromRunner
+    } else {
+      sqlStatement = SqlStatement.selectAllFromRunningLog
+    }
+    return sqlStatement
+  }
+
+  insertRunningLog ({ distance, dateString }: { distance: number, dateString: string }) {
+    const method = () => {
+      const statement = this.#db.prepare(SqlStatement.insertRunningLog)
+      statement.run(distance, dateString)
+      statement.finalize()
+    }
+    this.#serialize(method)
   }
 }
