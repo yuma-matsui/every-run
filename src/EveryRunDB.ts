@@ -1,4 +1,4 @@
-import sqlite3, { type RunResult } from 'sqlite3'
+import sqlite3 from 'sqlite3'
 import * as SqlStatement from './every_run_db_statements.js'
 export class EveryRunDB {
   static storage = './every_run.db'
@@ -58,11 +58,11 @@ export class EveryRunDB {
     })
   }
 
-  all (table: 'runner' | 'runningLog') {
-    return new Promise<RunResult[]>(resolve => {
+  all<T>(table: 'runner' | 'runningLog') {
+    return new Promise<T>(resolve => {
       const sqlStatement = this.#runnerOrRunningLog(table)
       const method = () => {
-        this.#db.all(sqlStatement, (error: Error, rows: RunResult[]) => {
+        this.#db.all(sqlStatement, (error: Error, rows: T) => {
           if (error) throw error
           resolve(rows)
         })
