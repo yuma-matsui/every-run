@@ -115,9 +115,18 @@ export class EveryRun {
   }
 
   #updateDailyGoal () {
-    const distance = this.#uOptionParameter()
-    this.#db.updateRunner(distance)
-    console.log(`1日の目標距離を${distance}kmに変更しました。`)
+    try {
+      const distance = this.#uOptionParameter()
+      this.#db.updateRunner(distance)
+      console.log(`1日の目標距離を${distance}kmに変更しました。`)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
+    }
   }
 
   #uOptionParameter () {

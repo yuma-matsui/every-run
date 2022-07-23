@@ -37,6 +37,15 @@ export class EveryRunDB {
     this.#serialize(method)
   }
 
+  updateRunner (distance: number) {
+    const method = () => {
+      const statement = this.#db.prepare(SqlStatement.updateRunner)
+      statement.run(distance)
+      statement.finalize()
+    }
+    this.#serialize(method)
+  }
+
   getDailyGoal () {
     return new Promise<number>(resolve => {
       const method = () => {
