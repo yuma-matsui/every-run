@@ -29,11 +29,11 @@ export class EveryRun {
       }
     }
 
-    this.#runOption()
+    await this.#runOption()
   }
 
   async #existRunner () {
-    const runners = await this.#db.all()
+    const runners = await this.#db.all('runner')
     return runners.length === 1
   }
 
@@ -67,7 +67,7 @@ export class EveryRun {
     return Number.isNaN(Number(answer)) || Number(answer) <= 0 || Number(answer) > 20
   }
 
-  #runOption () {
+  async #runOption () {
     if (this.#options.t) {
       this.#readTotalLog()
     } else if (this.#options.y || this.#options.m) {
@@ -77,7 +77,7 @@ export class EveryRun {
     } else if (this.#options.u) {
       this.#updateDailyGoal()
     } else {
-      this.#insertDailyLog()
+      await this.#insertDailyLog()
     }
   }
 
@@ -97,7 +97,19 @@ export class EveryRun {
     console.log('1日の目標距離を変更します')
   }
 
-  #insertDailyLog () {
-    console.log('Great run!')
+  async #insertDailyLog () {
+    try {
+      const distance = await this.#db.getDailyGoal()
+      const dateString = new Date().toLocaleDateString()
+      this.#db.insertRunningLog({ distance, dateString })
+      console.log('Great run!')
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
+    }
   }
 }
