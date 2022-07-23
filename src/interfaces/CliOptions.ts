@@ -16,4 +16,10 @@ interface EveryRunOptions {
   e: NumUnionBool
 }
 
-export { CliOptions, EveryRunOptions }
+interface RunningLog {
+  id: number
+  distance: number
+  date: string
+}
+
+export { CliOptions, EveryRunOptions, RunningLog }
