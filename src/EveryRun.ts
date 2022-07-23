@@ -17,26 +17,24 @@ export class EveryRun {
   }
 
   async #start () {
-    if (!this.#existRunner()) {
-      await this.#createRunner()
-      return
+    try {
+      if (!(await this.#existRunner())) {
+        await this.#createRunner()
+        return
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
     }
 
-    if (this.#options.t) {
-      this.#readTotalLog()
-    } else if (this.#options.y || this.#options.m) {
-      this.#readPeriodLog()
-    } else if (this.#options.e) {
-      this.#insertExtraLog()
-    } else if (this.#options.u) {
-      this.#updateDailyGoal()
-    } else {
-      this.#insertDailyLog()
-    }
+    this.#runOption()
   }
 
-  #existRunner () {
-    return false
+  async #existRunner () {
+    const runners = await this.#db.all()
+    return runners.length === 1
   }
 
   async #createRunner () {
@@ -51,6 +49,35 @@ export class EveryRun {
       }
     } finally {
       this.#db.close()
+    }
+  }
+
+  #askDistance () {
+    return new Promise<number>((resolve, reject) => {
+      const rl = readline.createInterface({ input, output })
+      rl.question('How many kilometer do you run a day?\n', answer => {
+        if (this.#isInvalidAnswer(answer)) reject(new Error(`${answer} is invalid. Please input a number\n greater than 0 \n or less equal than 20.`))
+        resolve(Number(answer))
+        rl.close()
+      })
+    })
+  }
+
+  #isInvalidAnswer (answer: string): boolean {
+    return Number.isNaN(Number(answer)) || Number(answer) <= 0 || Number(answer) > 20
+  }
+
+  #runOption () {
+    if (this.#options.t) {
+      this.#readTotalLog()
+    } else if (this.#options.y || this.#options.m) {
+      this.#readPeriodLog()
+    } else if (this.#options.e) {
+      this.#insertExtraLog()
+    } else if (this.#options.u) {
+      this.#updateDailyGoal()
+    } else {
+      this.#insertDailyLog()
     }
   }
 
@@ -72,20 +99,5 @@ export class EveryRun {
 
   #insertDailyLog () {
     console.log('Great run!')
-  }
-
-  #askDistance () {
-    return new Promise<number>((resolve, reject) => {
-      const rl = readline.createInterface({ input, output })
-      rl.question('How many kilometer do you run a day?\n', answer => {
-        if (this.#isInvalidAnswer(answer)) reject(new Error(`${answer} is invalid. Please input a number\n greater than 0 \n or less equal than 20.`))
-        resolve(Number(answer))
-        rl.close()
-      })
-    })
-  }
-
-  #isInvalidAnswer (answer: string): boolean {
-    return Number.isNaN(Number(answer)) || Number(answer) <= 0 || Number(answer) > 20
   }
 }
