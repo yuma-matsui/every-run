@@ -1,7 +1,8 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
-import { EveryRunOptions } from './interfaces/CliOptions.js'
+import { EveryRunOptions, RunningLog } from './interfaces/CliOptions.js'
 import { EveryRunDB } from './EveryRunDB.js'
+import { RunResult } from 'sqlite3'
 
 export class EveryRun {
   static async start (options: EveryRunOptions, db: EveryRunDB) {
@@ -33,7 +34,7 @@ export class EveryRun {
   }
 
   async #existRunner () {
-    const runners = await this.#db.all('runner')
+    const runners = await this.#db.all<RunResult[]>('runner')
     return runners.length === 1
   }
 
@@ -69,7 +70,7 @@ export class EveryRun {
 
   async #runOption () {
     if (this.#options.t) {
-      this.#readTotalLog()
+      await this.#readTotalLog()
     } else if (this.#options.y || this.#options.m) {
       this.#readPeriodLog()
     } else if (this.#options.e) {
@@ -81,8 +82,27 @@ export class EveryRun {
     }
   }
 
-  #readTotalLog () {
-    console.log('これまでの全走行距離を返します')
+  async #readTotalLog () {
+    try {
+      const totalDistance = await this.#totalRunningDistance()
+      console.log(`これまでの全走行距離は${totalDistance}kmです。`)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
+    }
+  }
+
+  async #totalRunningDistance (): Promise<number> {
+    const allRunningLog = await this.#db.all<RunningLog[]>('runningLog')
+    let totalDistance = 0
+    for (const { distance } of allRunningLog) {
+      totalDistance += distance
+    }
+    return totalDistance
   }
 
   #readPeriodLog () {
