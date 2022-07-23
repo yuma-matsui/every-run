@@ -55,8 +55,8 @@ export class EveryRun {
   #askDistance () {
     return new Promise<number>((resolve, reject) => {
       const rl = readline.createInterface({ input, output })
-      rl.question('How many kilometer do you run a day?\n', answer => {
-        if (this.#isInvalidAnswer(answer)) reject(new Error(`${answer} is invalid. Please input a number\n greater than 0 \n or less equal than 20.`))
+      rl.question('1日何km走りますか?\n', answer => {
+        if (this.#isInvalidAnswer(answer)) reject(new Error(`${answer}は不正です。1〜20kmで設定してください。`))
         resolve(Number(answer))
         rl.close()
       })
@@ -73,7 +73,7 @@ export class EveryRun {
     } else if (this.#options.y || this.#options.m) {
       this.#readPeriodLog()
     } else if (this.#options.e) {
-      this.#insertExtraLog()
+      await this.#insertExtraLog()
     } else if (this.#options.u) {
       this.#updateDailyGoal()
     } else {
@@ -89,8 +89,29 @@ export class EveryRun {
     console.log('指定した年、月の走行距離を返します')
   }
 
-  #insertExtraLog () {
-    console.log('いつもより多く走れました')
+  async #insertExtraLog () {
+    try {
+      const distance = this.#eOptionParameter()
+      const dateString = new Date().toLocaleDateString()
+      this.#db.insertRunningLog({ distance, dateString })
+      console.log(`Fantastic!! 目標より${await this.#extraDistance()}km多く走りました!`)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
+    }
+  }
+
+  #eOptionParameter () {
+    if (typeof this.#options.e === 'boolean') process.exit()
+    return this.#options.e
+  }
+
+  async #extraDistance () {
+    return this.#eOptionParameter() - (await this.#db.getDailyGoal())
   }
 
   #updateDailyGoal () {
