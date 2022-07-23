@@ -1,6 +1,5 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
-import { Runner } from './Runner.js'
 import { EveryRunOptions } from './interfaces/CliOptions.js'
 import { EveryRunDB } from './EveryRunDB.js'
 
@@ -18,6 +17,11 @@ export class EveryRun {
   }
 
   async #start () {
+    if (!this.#existRunner()) {
+      await this.#createRunner()
+      return
+    }
+
     if (this.#options.t) {
       this.#readTotalLog()
     } else if (this.#options.y || this.#options.m) {
@@ -27,39 +31,47 @@ export class EveryRun {
     } else if (this.#options.u) {
       this.#updateDailyGoal()
     } else {
-      await this.#firstOrCreate()
+      this.#insertDailyLog()
+    }
+  }
+
+  #existRunner () {
+    return false
+  }
+
+  async #createRunner () {
+    try {
+      const distance = await this.#askDistance()
+      this.#db.insertRunner(distance)
+      console.log(`1日の目標距離を${distance}kmに設定しました。`)
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
     }
   }
 
   #readTotalLog () {
-    console.log('Show your total running log.')
+    console.log('これまでの全走行距離を返します')
   }
 
   #readPeriodLog () {
-    console.log('Show your yearly total running log')
-    console.log('Show your monthly total running log')
+    console.log('指定した年、月の走行距離を返します')
   }
 
   #insertExtraLog () {
-    console.log(`Fantastic!! You've reached ${Number(this.#options.e)} km.`)
+    console.log('いつもより多く走れました')
   }
 
   #updateDailyGoal () {
-    console.log('How many kilometer do you run a day?')
+    console.log('1日の目標距離を変更します')
   }
 
-  async #firstOrCreate () {
-    if (this.#existRunner()) {
-      console.log("Congratulation! You've reached your daily goal.")
-    } else {
-      const distance = await this.#askDistance()
-      const runner = new Runner(distance)
-      console.log(`Good Luck! You set the ${runner.targetDistance} as your daily goal.`)
-    }
-  }
-
-  #existRunner (): boolean {
-    return true
+  #insertDailyLog () {
+    console.log('Great run!')
   }
 
   #askDistance () {
