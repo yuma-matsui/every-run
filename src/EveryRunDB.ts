@@ -7,7 +7,7 @@ export class EveryRunDB {
   constructor () {
     sqlite3.verbose()
     this.#db = new sqlite3.Database(EveryRunDB.storage)
-    this.#createTable(SqlStatement.createRunnerTable)
+    this.#createTable(SqlStatement.createDailyDistanceTable)
     this.#createTable(SqlStatement.createRunningLogTable)
   }
 
@@ -28,18 +28,18 @@ export class EveryRunDB {
     })
   }
 
-  insertRunner (distance: number) {
+  insertDailyDistance (distance: number) {
     const method = () => {
-      const statement = this.#db.prepare(SqlStatement.insertRunner)
+      const statement = this.#db.prepare(SqlStatement.insertDailyDistance)
       statement.run(distance)
       statement.finalize()
     }
     this.#serialize(method)
   }
 
-  updateRunner (distance: number) {
+  updateDailyDistance (distance: number) {
     const method = () => {
-      const statement = this.#db.prepare(SqlStatement.updateRunner)
+      const statement = this.#db.prepare(SqlStatement.updateDailyDistance)
       statement.run(distance)
       statement.finalize()
     }
@@ -49,7 +49,7 @@ export class EveryRunDB {
   getDailyGoal () {
     return new Promise<number>(resolve => {
       const method = () => {
-        this.#db.get(SqlStatement.selectDistanceFromRunner, (error: Error, { distance }: { distance: number }) => {
+        this.#db.get(SqlStatement.selectDistanceFromDailyDistance, (error: Error, { distance }: { distance: number }) => {
           if (error) throw error
           resolve(distance)
         })
@@ -74,7 +74,7 @@ export class EveryRunDB {
   #runnerOrRunningLog (table: 'runner' | 'runningLog') {
     let sqlStatement: string
     if (table === 'runner') {
-      sqlStatement = SqlStatement.selectAllFromRunner
+      sqlStatement = SqlStatement.selectAllFromDailyDistance
     } else {
       sqlStatement = SqlStatement.selectAllFromRunningLog
     }
