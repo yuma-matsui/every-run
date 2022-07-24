@@ -1,5 +1,5 @@
 import { program } from 'commander'
-import { CliOptions, EveryRunOptions } from './interfaces/CliOptions.js'
+import { CliOptions, EveryRunOptions } from './interfaces.js'
 
 export class EveryRunOption {
   readonly #parameters: CliOptions

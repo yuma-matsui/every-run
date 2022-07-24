@@ -22,4 +22,9 @@ interface RunningLog {
   date: string
 }
 
-export { CliOptions, EveryRunOptions, RunningLog, NumUnionBool }
+interface DailyDistance {
+  id: number
+  distance: number
+}
+
+export { CliOptions, EveryRunOptions, RunningLog, NumUnionBool, DailyDistance }

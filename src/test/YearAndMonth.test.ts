@@ -1,4 +1,4 @@
-import { NumUnionBool } from '../interfaces/CliOptions'
+import { NumUnionBool } from '../interfaces.js'
 import { YearAndMonth } from '../YearAndMonth'
 import * as Mock from './mocks/mockFunctions'
 
