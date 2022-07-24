@@ -10,8 +10,8 @@ export class EveryRun {
     await er.#start()
   }
 
-  #options: EveryRunOptions
-  #db: EveryRunDB
+  readonly #options: EveryRunOptions
+  readonly #db: EveryRunDB
   constructor (options: EveryRunOptions, db: EveryRunDB) {
     this.#options = options
     this.#db = db
@@ -19,8 +19,8 @@ export class EveryRun {
 
   async #start () {
     try {
-      if (!(await this.#existRunner())) {
-        await this.#createRunner()
+      if (!(await this.#existRecord())) {
+        await this.#createRecord()
         return
       }
     } catch (error) {
@@ -33,15 +33,15 @@ export class EveryRun {
     await this.#runOption()
   }
 
-  async #existRunner () {
-    const runners = await this.#db.all<RunResult[]>('runner')
-    return runners.length === 1
+  async #existRecord () {
+    const records = await this.#db.all<RunResult[]>('runner')
+    return records.length === 1
   }
 
-  async #createRunner () {
+  async #createRecord () {
     try {
       const distance = await this.#askDistance()
-      this.#db.insertRunner(distance)
+      this.#db.insertDailyDistance(distance)
       console.log(`1日の目標距離を${distance}kmに設定しました。`)
     } catch (error) {
       if (error instanceof Error) {
@@ -70,19 +70,19 @@ export class EveryRun {
 
   async #runOption () {
     if (this.#options.t) {
-      await this.#readTotalLog()
+      await this.#printTotalRunningLog()
     } else if (this.#options.y || this.#options.m) {
-      this.#readPeriodLog()
+      this.#printSpecificPeriodLog()
     } else if (this.#options.e) {
-      await this.#insertExtraLog()
+      await this.#insertExtraRunningLog()
     } else if (this.#options.u) {
-      this.#updateDailyGoal()
+      this.#updateDailyDistance()
     } else {
       await this.#insertDailyLog()
     }
   }
 
-  async #readTotalLog () {
+  async #printTotalRunningLog () {
     try {
       const totalDistance = await this.#totalRunningDistance()
       console.log(`これまでの全走行距離は${totalDistance}kmです。`)
@@ -96,7 +96,7 @@ export class EveryRun {
     }
   }
 
-  async #totalRunningDistance (): Promise<number> {
+  async #totalRunningDistance () {
     const allRunningLog = await this.#db.all<RunningLog[]>('runningLog')
     let totalDistance = 0
     for (const { distance } of allRunningLog) {
@@ -105,11 +105,11 @@ export class EveryRun {
     return totalDistance
   }
 
-  #readPeriodLog () {
+  #printSpecificPeriodLog () {
     console.log('指定した年、月の走行距離を返します')
   }
 
-  async #insertExtraLog () {
+  async #insertExtraRunningLog () {
     try {
       const distance = this.#eOptionParameter()
       const dateString = new Date().toLocaleDateString()
@@ -134,10 +134,10 @@ export class EveryRun {
     return this.#eOptionParameter() - (await this.#db.getDailyGoal())
   }
 
-  #updateDailyGoal () {
+  #updateDailyDistance () {
     try {
       const distance = this.#uOptionParameter()
-      this.#db.updateRunner(distance)
+      this.#db.updateDailyDistance(distance)
       console.log(`1日の目標距離を${distance}kmに変更しました。`)
     } catch (error) {
       if (error instanceof Error) {
@@ -151,6 +151,10 @@ export class EveryRun {
 
   #uOptionParameter () {
     if (typeof this.#options.u === 'boolean') process.exit()
+    if (this.#options.u > 20) {
+      console.log('毎日20km以上走るのは故障のリスクがあります。20km以下に設定しましょう。')
+      process.exit()
+    }
     return this.#options.u
   }
 
