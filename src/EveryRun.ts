@@ -3,6 +3,7 @@ import { stdin as input, stdout as output } from 'process'
 import { EveryRunOptions, RunningLog } from './interfaces/CliOptions.js'
 import { EveryRunDB } from './EveryRunDB.js'
 import { RunResult } from 'sqlite3'
+import { YearAndMonth } from './YearAndMonth.js'
 
 export class EveryRun {
   static async start (options: EveryRunOptions, db: EveryRunDB) {
@@ -64,7 +65,7 @@ export class EveryRun {
     })
   }
 
-  #isInvalidAnswer (answer: string): boolean {
+  #isInvalidAnswer (answer: string) {
     return Number.isNaN(Number(answer)) || Number(answer) <= 0 || Number(answer) > 20
   }
 
@@ -72,7 +73,7 @@ export class EveryRun {
     if (this.#options.t) {
       await this.#printTotalRunningLog()
     } else if (this.#options.y || this.#options.m) {
-      this.#printSpecificPeriodLog()
+      await this.#printSpecificPeriodLog()
     } else if (this.#options.e) {
       await this.#insertExtraRunningLog()
     } else if (this.#options.u) {
@@ -84,7 +85,8 @@ export class EveryRun {
 
   async #printTotalRunningLog () {
     try {
-      const totalDistance = await this.#totalRunningDistance()
+      const allRunningLog = await this.#db.all<RunningLog[]>('runningLog')
+      const totalDistance = this.#totalRunningDistance(allRunningLog)
       console.log(`これまでの全走行距離は${totalDistance}kmです。`)
     } catch (error) {
       if (error instanceof Error) {
@@ -96,17 +98,73 @@ export class EveryRun {
     }
   }
 
-  async #totalRunningDistance () {
-    const allRunningLog = await this.#db.all<RunningLog[]>('runningLog')
+  #totalRunningDistance (runningLog: RunningLog[]) {
     let totalDistance = 0
-    for (const { distance } of allRunningLog) {
+    for (const { distance } of runningLog) {
       totalDistance += distance
     }
     return totalDistance
   }
 
-  #printSpecificPeriodLog () {
-    console.log('指定した年、月の走行距離を返します')
+  async #printSpecificPeriodLog () {
+    try {
+      const totalDistance = await this.#getSpecificPeriodTotalDistance()
+      console.log(this.#specificPeriodString(totalDistance))
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message)
+        process.exit()
+      }
+    } finally {
+      this.#db.close()
+    }
+  }
+
+  #specificPeriodString (totalDistance: number) {
+    let str: string
+
+    if (this.#onlyYear()) {
+      str = `${this.#yOptionParameter()}年の合計走行距離は${totalDistance}kmです。`
+    } else if (typeof this.#options.y === 'boolean') {
+      str = `${new Date().getFullYear()}年${this.#mOptionParameter()}月の合計走行距離は${totalDistance}kmです。`
+    } else {
+      str = `${this.#yOptionParameter()}年${this.#mOptionParameter()}月の合計走行距離は${totalDistance}kmです。`
+    }
+    return str
+  }
+
+  #yOptionParameter () {
+    if (typeof this.#options.y === 'boolean') process.exit()
+    return this.#options.y
+  }
+
+  #mOptionParameter () {
+    if (typeof this.#options.m === 'boolean') process.exit()
+    return this.#options.m
+  }
+
+  async #getSpecificPeriodTotalDistance () {
+    const allRunningLog = await this.#db.all<RunningLog[]>('runningLog')
+    const targetPeriodLog = allRunningLog.filter(({ date }: RunningLog) => {
+      return this.#targetPeriodFilter().test(date)
+    })
+    return this.#totalRunningDistance(targetPeriodLog)
+  }
+
+  #onlyYear () {
+    return (typeof this.#options.y === 'number') && (typeof this.#options.m === 'boolean')
+  }
+
+  #targetPeriodFilter () {
+    let targetPeriodFilter: RegExp
+    const { year, month } = new YearAndMonth(this.#options.y, this.#options.m).property
+
+    if (this.#onlyYear()) {
+      targetPeriodFilter = new RegExp(String.raw`^${year}\/`)
+    } else {
+      targetPeriodFilter = new RegExp(String.raw`^${year}\/${month}\/`)
+    }
+    return targetPeriodFilter
   }
 
   async #insertExtraRunningLog () {
