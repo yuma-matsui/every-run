@@ -27,7 +27,7 @@ describe('EveryRunOptionクラス', () => {
           [4, { t: true, y: '2000', m: '12', e: '5' }],
           [3, { t: true, y: '2000', m: '12' }]
         ])('引数が%i個の場合', (_, options) => {
-          checkOptions(options, 'Invalid Options.')
+          checkOptions(options, 'オプションの指定が不正です。')
         })
 
         it.each([
@@ -41,7 +41,7 @@ describe('EveryRunOptionクラス', () => {
           [{ t: true, u: '5' }],
           [{ u: '5', e: '5' }]
         ])('引数が2つ且つ-yと-mの組み合わせ以外の時', options => {
-          checkOptions(options, 'Invalid Options.')
+          checkOptions(options, 'オプションの指定が不正です。')
         })
 
         it.each([
@@ -50,7 +50,7 @@ describe('EveryRunOptionクラス', () => {
           [{ u: '0' }],
           [{ e: '0' }]
         ])('オプション引数が0の場合', options => {
-          checkOptions(options, 'オプション引数が不正です。0より大きい数値を指定してください。')
+          checkOptions(options, '引数が不正です。0より大きい数値を指定してください。')
         })
 
         it.each([
@@ -59,7 +59,7 @@ describe('EveryRunOptionクラス', () => {
           [{ u: 'invalid' }],
           [{ e: 'invalid' }]
         ])('オプション引数が文字の場合', options => {
-          checkOptions(options, 'オプション引数が不正です。0より大きい数値を指定してください。')
+          checkOptions(options, '引数が不正です。0より大きい数値を指定してください。')
         })
       })
 

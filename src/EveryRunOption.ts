@@ -16,16 +16,24 @@ export class EveryRunOption {
   }
 
   #inspectParameters (): void {
-    const parameters: Array<number | boolean> = []
-    for (const value of Object.values(this.parameters)) {
-      if ((typeof value === 'number') || (typeof value === 'boolean')) parameters.push(value)
-    }
-
-    const entries = parameters.filter(param => param)
+    const entries = this.#extractEntries()
     if ((!this.#existYearAndMonth() && entries.length > 1) || (this.#existYearAndMonth() && entries.length > 2)) {
-      console.log('Invalid Options.')
+      console.log('オプションの指定が不正です。')
       process.exit()
     }
+  }
+
+  #extractEntries () {
+    const parameters: Array<number | boolean> = []
+    Object.values(this.parameters).forEach((parameter: number | boolean) => {
+      if (this.#isEveryRunOptionEntry(parameter)) parameters.push(parameter)
+    })
+
+    return parameters.filter(parameter => parameter)
+  }
+
+  #isEveryRunOptionEntry (parameter: number | boolean): parameter is number | boolean {
+    return (typeof parameter === 'number') || (typeof parameter === 'boolean')
   }
 
   #existYearAndMonth (): boolean {
@@ -49,7 +57,7 @@ export class EveryRunOption {
 
     const numberParam = Number(param)
     if (Number.isNaN(numberParam) || (numberParam <= 0)) {
-      console.log('オプション引数が不正です。0より大きい数値を指定してください。')
+      console.log('引数が不正です。0より大きい数値を指定してください。')
       process.exit()
     }
     return numberParam
