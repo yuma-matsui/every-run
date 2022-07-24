@@ -22,4 +22,4 @@ interface RunningLog {
   date: string
 }
 
-export { CliOptions, EveryRunOptions, RunningLog }
+export { CliOptions, EveryRunOptions, RunningLog, NumUnionBool }
