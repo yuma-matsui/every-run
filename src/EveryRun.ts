@@ -1,8 +1,7 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
-import { EveryRunOptions, RunningLog } from './interfaces/CliOptions.js'
+import { EveryRunOptions, RunningLog, DailyDistance } from './interfaces.js'
 import { EveryRunDB } from './EveryRunDB.js'
-import { RunResult } from 'sqlite3'
 import { YearAndMonth } from './YearAndMonth.js'
 
 export class EveryRun {
@@ -35,7 +34,7 @@ export class EveryRun {
   }
 
   async #existRecord () {
-    const records = await this.#db.all<RunResult[]>('runner')
+    const records = await this.#db.all<DailyDistance[]>('dailyDistance')
     return records.length === 1
   }
 
@@ -169,10 +168,11 @@ export class EveryRun {
 
   async #insertExtraRunningLog () {
     try {
+      const extraDistance = await this.#extraDistanceOrExit()
       const distance = this.#eOptionParameter()
       const dateString = new Date().toLocaleDateString()
       this.#db.insertRunningLog({ distance, dateString })
-      console.log(`Fantastic!! 目標より${await this.#extraDistance()}km多く走りました!`)
+      console.log(`Fantastic!! 目標より${extraDistance}km多く走りました!`)
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message)
@@ -181,6 +181,16 @@ export class EveryRun {
     } finally {
       this.#db.close()
     }
+  }
+
+  async #extraDistanceOrExit () {
+    const extraDistance = await this.#extraDistance()
+    const dailyDistance = await this.#db.getDailyGoal()
+    if (extraDistance <= 0) {
+      console.log(`${this.#eOptionParameter()}kmは1日の目標距離${dailyDistance}kmより短いです。`)
+      process.exit()
+    }
+    return extraDistance
   }
 
   #eOptionParameter () {

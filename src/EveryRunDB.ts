@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3'
 import * as SqlStatement from './every_run_db_statements.js'
+import { RunningLogParams, dailyDistanceOrRunningLog } from './interfaces.js'
 export class EveryRunDB {
   static storage = './every_run.db'
 
@@ -58,9 +59,9 @@ export class EveryRunDB {
     })
   }
 
-  all<T>(table: 'runner' | 'runningLog') {
+  all<T>(table: dailyDistanceOrRunningLog) {
     return new Promise<T>(resolve => {
-      const sqlStatement = this.#runnerOrRunningLog(table)
+      const sqlStatement = this.#getSelectAllStatement(table)
       const method = () => {
         this.#db.all(sqlStatement, (error: Error, rows: T) => {
           if (error) throw error
@@ -71,9 +72,9 @@ export class EveryRunDB {
     })
   }
 
-  #runnerOrRunningLog (table: 'runner' | 'runningLog') {
+  #getSelectAllStatement (table: dailyDistanceOrRunningLog) {
     let sqlStatement: string
-    if (table === 'runner') {
+    if (table === 'dailyDistance') {
       sqlStatement = SqlStatement.selectAllFromDailyDistance
     } else {
       sqlStatement = SqlStatement.selectAllFromRunningLog
@@ -81,12 +82,30 @@ export class EveryRunDB {
     return sqlStatement
   }
 
-  insertRunningLog ({ distance, dateString }: { distance: number, dateString: string }) {
+  insertRunningLog ({ distance, dateString }: RunningLogParams) {
     const method = () => {
       const statement = this.#db.prepare(SqlStatement.insertRunningLog)
       statement.run(distance, dateString)
       statement.finalize()
     }
     this.#serialize(method)
+  }
+
+  dropTable (table: dailyDistanceOrRunningLog) {
+    const statement = this.#getDropStatement(table)
+    const method = () => {
+      this.#db.run(statement)
+    }
+    this.#serialize(method)
+  }
+
+  #getDropStatement (table: dailyDistanceOrRunningLog) {
+    let sqlStatement: string
+    if (table === 'dailyDistance') {
+      sqlStatement = SqlStatement.dropDailyDistanceTable
+    } else {
+      sqlStatement = SqlStatement.dropRunningLogTable
+    }
+    return sqlStatement
   }
 }
