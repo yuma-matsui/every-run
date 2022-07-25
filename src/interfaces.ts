@@ -8,6 +8,8 @@ interface CliOptions {
 
 type NumUnionBool = number | boolean
 
+type dailyDistanceOrRunningLog = 'dailyDistance' | 'runningLog'
+
 interface EveryRunOptions {
   t: boolean
   m: NumUnionBool
@@ -27,4 +29,9 @@ interface DailyDistance {
   distance: number
 }
 
-export { CliOptions, EveryRunOptions, RunningLog, NumUnionBool, DailyDistance }
+interface RunningLogParams {
+  distance: number
+  dateString: string
+}
+
+export { CliOptions, EveryRunOptions, RunningLog, NumUnionBool, DailyDistance, RunningLogParams, dailyDistanceOrRunningLog }
