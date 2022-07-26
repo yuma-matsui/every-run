@@ -91,6 +91,24 @@ export class EveryRunDB {
     this.#serialize(method)
   }
 
+  deleteRecords (table: dailyDistanceOrRunningLog) {
+    const sqlStatement = this.#getDeleteStatement(table)
+    const method = () => {
+      this.#db.run(sqlStatement)
+    }
+    this.#db.serialize(method)
+  }
+
+  #getDeleteStatement (table: dailyDistanceOrRunningLog) {
+    let sqlStatement: string
+    if (table === 'dailyDistance') {
+      sqlStatement = SqlStatement.deleteFromDailyDistance
+    } else {
+      sqlStatement = SqlStatement.deleteFromRunningLog
+    }
+    return sqlStatement
+  }
+
   dropTable (table: dailyDistanceOrRunningLog) {
     const statement = this.#getDropStatement(table)
     const method = () => {
