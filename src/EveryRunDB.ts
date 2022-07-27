@@ -47,18 +47,6 @@ export class EveryRunDB {
     this.#serialize(method)
   }
 
-  getDailyGoal () {
-    return new Promise<number>(resolve => {
-      const method = () => {
-        this.#db.get(SqlStatement.selectDistanceFromDailyDistance, (error: Error, { distance }: { distance: number }) => {
-          if (error) throw error
-          resolve(distance)
-        })
-      }
-      this.#serialize(method)
-    })
-  }
-
   all<T>(table: dailyDistanceOrRunningLog) {
     return new Promise<T>(resolve => {
       const sqlStatement = this.#getSelectAllStatement(table)
@@ -91,20 +79,20 @@ export class EveryRunDB {
     this.#serialize(method)
   }
 
-  dropTable (table: dailyDistanceOrRunningLog) {
-    const statement = this.#getDropStatement(table)
+  deleteRecords (table: dailyDistanceOrRunningLog) {
+    const sqlStatement = this.#getDeleteStatement(table)
     const method = () => {
-      this.#db.run(statement)
+      this.#db.run(sqlStatement)
     }
-    this.#serialize(method)
+    this.#db.serialize(method)
   }
 
-  #getDropStatement (table: dailyDistanceOrRunningLog) {
+  #getDeleteStatement (table: dailyDistanceOrRunningLog) {
     let sqlStatement: string
     if (table === 'dailyDistance') {
-      sqlStatement = SqlStatement.dropDailyDistanceTable
+      sqlStatement = SqlStatement.deleteFromDailyDistance
     } else {
-      sqlStatement = SqlStatement.dropRunningLogTable
+      sqlStatement = SqlStatement.deleteFromRunningLog
     }
     return sqlStatement
   }

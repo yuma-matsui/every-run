@@ -1,16 +1,22 @@
 import sqlite3 from 'sqlite3'
 import { EveryRunDB } from '../EveryRunDB'
 import { DailyDistance, RunningLog, RunningLogParams } from '../interfaces'
+import { clearDB, setUpTables } from './mocks/mockFunctions'
 
 describe('EveryRunDBクラス', () => {
-  const db = new EveryRunDB()
+  let db: EveryRunDB
   let distance: number
+  let dateString: string
+
   beforeEach(() => {
+    db = new EveryRunDB()
     distance = 5
+    dateString = new Date().toLocaleDateString()
+    setUpTables(db, { distance, dateString })
   })
 
   afterAll(() => {
-    db.close()
+    clearDB(db)
   })
 
   describe('コンストラクタ', () => {
@@ -52,27 +58,10 @@ describe('EveryRunDBクラス', () => {
     })
   })
 
-  describe('#getDailyGoal', () => {
-    it('id = 1のレコードのdistanceカラムの値を返す', async () => {
-      const dailyDistance = await db.getDailyGoal()
-      const firstRecord = (await db.all<DailyDistance[]>('dailyDistance')).at(0)
-      expect(dailyDistance).toBe(firstRecord?.distance)
-    })
-
-    it('updateDailyDistanceした場合その引数に与えた値を返す', async () => {
-      distance = 15
-      db.updateDailyDistance(distance)
-      const dailyDistance = await db.getDailyGoal()
-      expect(dailyDistance).toBe(distance)
-    })
-  })
-
   describe('#insertRunningLog', () => {
     let distance = 5
-    let dateString = new Date().toLocaleDateString()
     const runningLogParams: RunningLogParams = { distance, dateString }
     it('引数にRunningLogParams型のオブジェクトを渡すとレコードが一件増える', async () => {
-      console.log(runningLogParams)
       const beforeRecordLength = (await db.all<RunningLog[]>('runningLog')).length
       db.insertRunningLog(runningLogParams)
       const afterRecordLength = (await db.all<RunningLog[]>('runningLog')).length
@@ -103,12 +92,25 @@ describe('EveryRunDBクラス', () => {
 
     it('引数にrunningLogを与えた場合RunningLog型の配列を返す', async () => {
       const runningLogs = await db.all<RunningLog[]>('runningLog')
-      console.log(runningLogs)
       expect(runningLogs.every(runningLog => {
         return (typeof runningLog.id === 'number') &&
                 (typeof runningLog.distance === 'number') &&
                 (typeof runningLog.date === 'string')
       })).toEqual(true)
+    })
+  })
+
+  describe('deleteRecords', () => {
+    it('引数にdailyDistanceを与えた場合DailyDistanceテーブルの全レコードを削除する', async () => {
+      db.deleteRecords('dailyDistance')
+      const dailyDistanceSize = (await db.all<DailyDistance[]>('dailyDistance')).length
+      expect(dailyDistanceSize).toBe(0)
+    })
+
+    it('引数にrunningLogを与えた場合RunningLogテーブルの全レコードを削除する', async () => {
+      db.deleteRecords('runningLog')
+      const runningLogSize = (await db.all<RunningLog[]>('runningLog')).length
+      expect(runningLogSize).toBe(0)
     })
   })
 })
