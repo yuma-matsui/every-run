@@ -1,6 +1,6 @@
-import { EveryRun } from '../EveryRun'
-import { EveryRunDB } from '../EveryRunDB'
-import { EveryRunOptions } from '../interfaces.js'
+import { EveryRun } from '../src/EveryRun'
+import { EveryRunDB } from '../src/EveryRunDB'
+import { EveryRunOptions } from '../src/interfaces.js'
 import * as Mock from '../test/mocks/mockFunctions'
 
 describe('EveryRunクラスのテスト', () => {

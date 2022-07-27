@@ -1,5 +1,5 @@
-import { NumUnionBool } from '../interfaces.js'
-import { YearAndMonth } from '../YearAndMonth'
+import { NumUnionBool } from '../src/interfaces.js'
+import { YearAndMonth } from '../src/YearAndMonth'
 import * as Mock from './mocks/mockFunctions'
 
 describe('YearAndMonthクラス', () => {
