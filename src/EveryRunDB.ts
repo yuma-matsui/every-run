@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3'
 import * as SqlStatement from './every_run_db_statements.js'
+import { RunningLogParams, dailyDistanceOrRunningLog } from './interfaces.js'
 export class EveryRunDB {
   static storage = './every_run.db'
 
@@ -46,21 +47,9 @@ export class EveryRunDB {
     this.#serialize(method)
   }
 
-  getDailyGoal () {
-    return new Promise<number>(resolve => {
-      const method = () => {
-        this.#db.get(SqlStatement.selectDistanceFromDailyDistance, (error: Error, { distance }: { distance: number }) => {
-          if (error) throw error
-          resolve(distance)
-        })
-      }
-      this.#serialize(method)
-    })
-  }
-
-  all<T>(table: 'runner' | 'runningLog') {
+  all<T>(table: dailyDistanceOrRunningLog) {
     return new Promise<T>(resolve => {
-      const sqlStatement = this.#runnerOrRunningLog(table)
+      const sqlStatement = this.#getSelectAllStatement(table)
       const method = () => {
         this.#db.all(sqlStatement, (error: Error, rows: T) => {
           if (error) throw error
@@ -71,9 +60,9 @@ export class EveryRunDB {
     })
   }
 
-  #runnerOrRunningLog (table: 'runner' | 'runningLog') {
+  #getSelectAllStatement (table: dailyDistanceOrRunningLog) {
     let sqlStatement: string
-    if (table === 'runner') {
+    if (table === 'dailyDistance') {
       sqlStatement = SqlStatement.selectAllFromDailyDistance
     } else {
       sqlStatement = SqlStatement.selectAllFromRunningLog
@@ -81,12 +70,30 @@ export class EveryRunDB {
     return sqlStatement
   }
 
-  insertRunningLog ({ distance, dateString }: { distance: number, dateString: string }) {
+  insertRunningLog ({ distance, dateString }: RunningLogParams) {
     const method = () => {
       const statement = this.#db.prepare(SqlStatement.insertRunningLog)
       statement.run(distance, dateString)
       statement.finalize()
     }
     this.#serialize(method)
+  }
+
+  deleteRecords (table: dailyDistanceOrRunningLog) {
+    const sqlStatement = this.#getDeleteStatement(table)
+    const method = () => {
+      this.#db.run(sqlStatement)
+    }
+    this.#db.serialize(method)
+  }
+
+  #getDeleteStatement (table: dailyDistanceOrRunningLog) {
+    let sqlStatement: string
+    if (table === 'dailyDistance') {
+      sqlStatement = SqlStatement.deleteFromDailyDistance
+    } else {
+      sqlStatement = SqlStatement.deleteFromRunningLog
+    }
+    return sqlStatement
   }
 }
