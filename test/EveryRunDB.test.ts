@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3'
-import { EveryRunDB } from '../EveryRunDB'
-import { DailyDistance, RunningLog, RunningLogParams } from '../interfaces'
+import { EveryRunDB } from '../src/EveryRunDB'
+import { DailyDistance, RunningLog, RunningLogParams } from '../src/interfaces'
 import { clearDB, setUpTables } from './mocks/mockFunctions'
 
 describe('EveryRunDBクラス', () => {

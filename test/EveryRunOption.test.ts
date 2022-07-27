@@ -1,6 +1,6 @@
 import { program } from 'commander'
-import { EveryRunOption } from '../EveryRunOption'
-import { CliOptions, EveryRunOptions } from '../interfaces.js'
+import { EveryRunOption } from '../src/EveryRunOption'
+import { CliOptions, EveryRunOptions } from '../src/interfaces.js'
 import * as Mock from '../test/mocks/mockFunctions'
 
 describe('EveryRunOptionクラス', () => {
