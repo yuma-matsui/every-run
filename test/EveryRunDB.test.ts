@@ -15,8 +15,9 @@ describe('EveryRunDBクラス', () => {
     setUpTables(db, { distance, dateString })
   })
 
-  afterAll(() => {
+  afterEach(() => {
     clearDB(db)
+    db.close()
   })
 
   describe('コンストラクタ', () => {
