@@ -35,12 +35,12 @@ export class EveryRun {
 
   async #existRecord () {
     const records = await this.#db.all<DailyDistance[]>('dailyDistance')
-    return records.length === 1
+    return records.length >= 1
   }
 
   async #createRecord () {
     try {
-      const distance = await this.#askDistance()
+      const distance = await this.askDistance()
       this.#db.insertDailyDistance(distance)
       console.log(`1日の目標距離を${distance}kmに設定しました。`)
     } catch (error) {
@@ -53,7 +53,7 @@ export class EveryRun {
     }
   }
 
-  #askDistance () {
+  askDistance () {
     return new Promise<number>((resolve, reject) => {
       const rl = readline.createInterface({ input, output })
       rl.question('1日何km走りますか?\n', answer => {
@@ -185,12 +185,17 @@ export class EveryRun {
 
   async #extraDistanceOrExit () {
     const extraDistance = await this.#extraDistance()
-    const dailyDistance = await this.#db.getDailyGoal()
+    const dailyDistance = await this.#getDailyGoal()
     if (extraDistance <= 0) {
       console.log(`${this.#eOptionParameter()}kmは1日の目標距離${dailyDistance}kmより短いです。`)
       process.exit()
     }
     return extraDistance
+  }
+
+  async #getDailyGoal () {
+    const record = (await this.#db.all<DailyDistance[]>('dailyDistance')).at(0)
+    return record?.distance ?? process.exit()
   }
 
   #eOptionParameter () {
@@ -199,7 +204,7 @@ export class EveryRun {
   }
 
   async #extraDistance () {
-    return this.#eOptionParameter() - (await this.#db.getDailyGoal())
+    return this.#eOptionParameter() - (await this.#getDailyGoal())
   }
 
   #updateDailyDistance () {
@@ -228,7 +233,7 @@ export class EveryRun {
 
   async #insertDailyLog () {
     try {
-      const distance = await this.#db.getDailyGoal()
+      const distance = await this.#getDailyGoal()
       const dateString = new Date().toLocaleDateString()
       this.#db.insertRunningLog({ distance, dateString })
       console.log('Great run!')
