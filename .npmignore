@@ -1,0 +1,10 @@
+node_modules/
+dist/
+test/
+tsconfig.json
+tsconfig.eslint.json
+jest.config.js
+.eslintrc.cjs
+.eslingignore
+.gitignore
+every/run.db
