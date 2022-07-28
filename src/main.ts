@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { EveryRun } from './EveryRun.js'
 import { EveryRunDB } from './EveryRunDB.js'
 import { EveryRunOption } from './EveryRunOption.js'
