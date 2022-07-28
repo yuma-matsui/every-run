@@ -1,13 +1,16 @@
 {
   "name": "every-run",
   "version": "1.0.0",
-  "description": "A package to record log for runners",
+  "description": "A package to record running log for runners who run everyday.",
   "type": "module",
-  "main": "src/main.js",
+  "main": "./dist/src/main.js",
+  "types": "./dist/src/main.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint .",
-    "test": "jest --runInBand"
+    "prepare": "npm run build"
+  },
+  "bin": {
+    "every-run": "./dist/src/main.js"
   },
   "repository": {
     "type": "git",
@@ -20,21 +23,23 @@
   ],
   "author": "yum",
   "license": "MIT",
+  "dependencies": {
+    "@types/node": "^18.6.2",
+    "@types/sqlite3": "^3.1.8",
+    "commander": "^9.4.0",
+    "sqlite3": "^5.0.10",
+    "typescript": "^4.7.4"
+  },
   "devDependencies": {
     "@types/jest": "^28.1.6",
-    "@types/node": "^18.0.6",
-    "@types/sqlite3": "^3.1.8",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
-    "commander": "^9.4.0",
     "eslint": "^8.20.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-config-standard-typescript": "^1.0.3",
     "eslint-plugin-import": "^2.26.0",
     "jest": "^28.1.3",
-    "sqlite3": "^5.0.10",
     "ts-jest": "^28.0.7",
-    "ts-jest-resolver": "^2.0.0",
-    "typescript": "^4.7.4"
+    "ts-jest-resolver": "^2.0.0"
   }
 }
