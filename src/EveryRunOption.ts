@@ -1,5 +1,5 @@
 import { program } from 'commander'
-import { CliOptions, EveryRunOptions } from './interfaces.js'
+import { CliOptions, EveryRunOptions } from './types.js'
 
 export class EveryRunOption {
   readonly #parameters: CliOptions
@@ -17,7 +17,7 @@ export class EveryRunOption {
 
   #inspectParameters (): void {
     const entries = this.#extractEntries()
-    if ((!this.#existYearAndMonth() && entries.length > 1) || (this.#existYearAndMonth() && entries.length > 2)) {
+    if ((!this.#existCalendarOption() && entries.length > 1) || (this.#existCalendarOption() && entries.length > 2)) {
       console.log('オプションの指定が不正です。')
       process.exit()
     }
@@ -36,7 +36,7 @@ export class EveryRunOption {
     return (typeof parameter === 'number') || (typeof parameter === 'boolean')
   }
 
-  #existYearAndMonth (): boolean {
+  #existCalendarOption (): boolean {
     return (typeof this.parameters.y === 'number') && (typeof this.parameters.m === 'number')
   }
 

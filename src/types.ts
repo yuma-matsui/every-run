@@ -1,4 +1,6 @@
-interface CliOptions {
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+
+type CliOptions = {
   t?: boolean
   m?: string
   y?: string
@@ -10,7 +12,7 @@ type NumUnionBool = number | boolean
 
 type dailyDistanceOrRunningLog = 'dailyDistance' | 'runningLog'
 
-interface EveryRunOptions {
+type EveryRunOptions = {
   t: boolean
   m: NumUnionBool
   y: NumUnionBool
@@ -18,18 +20,18 @@ interface EveryRunOptions {
   e: NumUnionBool
 }
 
-interface RunningLog {
+type RunningLog = {
   id: number
   distance: number
   date: string
 }
 
-interface DailyDistance {
+type DailyDistance = {
   id: number
   distance: number
 }
 
-interface RunningLogParams {
+type RunningLogParams = {
   distance: number
   dateString: string
 }

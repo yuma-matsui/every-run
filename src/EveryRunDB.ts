@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3'
-import * as SqlStatement from './every_run_db_statements.js'
-import { RunningLogParams, dailyDistanceOrRunningLog } from './interfaces.js'
+import * as SqlStatement from './EveryRunDBStatements.js'
+import { RunningLogParams, dailyDistanceOrRunningLog } from './types.js'
 export class EveryRunDB {
   static storage = './every_run.db'
 

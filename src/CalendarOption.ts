@@ -1,6 +1,6 @@
-import { type NumUnionBool } from './interfaces.js'
+import { type NumUnionBool } from './types.js'
 
-export class YearAndMonth {
+export class CalendarOption {
   readonly #year: NumUnionBool
   readonly #month: NumUnionBool
   constructor (year: NumUnionBool, month: NumUnionBool) {
