@@ -1,7 +1,7 @@
 import { program } from 'commander'
 import { EveryRun } from '../../src/EveryRun.js'
 import { EveryRunDB } from '../../src/EveryRunDB.js'
-import { CliOptions, RunningLogParams } from '../../src/interfaces.js'
+import { CliOptions, RunningLogParams } from '../../src/types.js'
 
 export const consoleLog = jest.spyOn(console, 'log')
 export const exit = jest.spyOn(process, 'exit').mockImplementation()

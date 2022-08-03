@@ -1,4 +1,4 @@
-import { type NumUnionBool } from './interfaces.js'
+import { type NumUnionBool } from './types.js'
 
 export class YearAndMonth {
   readonly #year: NumUnionBool

@@ -1,6 +1,6 @@
 import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
-import { EveryRunOptions, RunningLog, DailyDistance } from './interfaces.js'
+import { EveryRunOptions, RunningLog, DailyDistance } from './types.js'
 import { EveryRunDB } from './EveryRunDB.js'
 import { YearAndMonth } from './YearAndMonth.js'
 
