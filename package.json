@@ -1,6 +1,6 @@
 {
   "name": "every-run",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A package to record running log for runners who run everyday.",
   "type": "module",
   "main": "./dist/src/main.js",
