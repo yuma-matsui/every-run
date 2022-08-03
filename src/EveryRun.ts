@@ -2,7 +2,7 @@ import * as readline from 'readline'
 import { stdin as input, stdout as output } from 'process'
 import { EveryRunOptions, RunningLog, DailyDistance } from './types.js'
 import { EveryRunDB } from './EveryRunDB.js'
-import { YearAndMonth } from './YearAndMonth.js'
+import { CalendarOption } from './CalendarOption.js'
 
 export class EveryRun {
   static async start (options: EveryRunOptions, db: EveryRunDB) {
@@ -156,7 +156,7 @@ export class EveryRun {
 
   #targetPeriodFilter () {
     let targetPeriodFilter: RegExp
-    const { year, month } = new YearAndMonth(this.#options.y, this.#options.m).property
+    const { year, month } = new CalendarOption(this.#options.y, this.#options.m).property
 
     if (this.#onlyYear()) {
       targetPeriodFilter = new RegExp(String.raw`^${year}\/`)
