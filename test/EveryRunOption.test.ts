@@ -1,20 +1,9 @@
-import { program } from 'commander'
 import { EveryRunOption } from '../src/EveryRunOption'
 import { CliOptions, EveryRunOptions } from '../src/types'
 import * as Mock from '../test/mocks/mockFunctions'
 
 describe('EveryRunOptionクラス', () => {
   describe('constructor', () => {
-    it('初期化時にprogramオブジェクトが呼ばれる', () => {
-      const mockCommanderOption = jest.spyOn(program, 'option')
-      const mockCommanderParse = jest.spyOn(program, 'parse')
-      const mockCommanderOpts = jest.spyOn(program, 'opts')
-      expect(new EveryRunOption())
-      expect(mockCommanderOption).toHaveBeenCalled()
-      expect(mockCommanderParse).toHaveBeenCalled()
-      expect(mockCommanderOpts).toHaveBeenCalled()
-    })
-
     describe('コマンドライン引数のチェック', () => {
       const checkOptions = (options: CliOptions, message: string) => {
         Mock.cliOptions(options)
